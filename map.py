@@ -7,8 +7,8 @@ import xml.etree.ElementTree as ET
 
 files = [
 ('map_locations.js',''),
-('map_locations_dungeon.js','_dungeon'),
-('map_locations_trial.js','_trial'),
+# ('map_locations_dungeon.js','_dungeon'),
+# ('map_locations_trial.js','_trial'),
 ]
 
 namefile = open('botw_names.json')
@@ -40,10 +40,14 @@ for outfilename,folder_suffix in files:
                     off_wait_revival_actors.add(link.get('DestUnitHashId'))
 
         for actor in dropactor_objs:
+            data: dict = dict()
+            data['file'] = filename.replace('.xml', '')
+
             name = actor.findall('./UnitConfigName')[0].text
             coords = [float(node.text[:-1]) for node in actor.findall('./Translate/value')]
             if len(coords) == 0:
                 continue
+            data['pos'] = [round(coords[0],2), round(coords[-1],2)]
             scale = [float(node.text[:-1]) for node in actor.findall('./Scale/value')]
             rotation = [float(node.text[:-1]) for node in actor.findall('./Rotate/value')]
             if len(rotation) == 0:
@@ -112,13 +116,15 @@ for outfilename,folder_suffix in files:
                         nice_name += '⭐⭐'
 
             actor_hash_id = actor.get('HashId')
+            data['hash_id'] = actor_hash_id
             if actor_hash_id in off_wait_revival_actors:
                 name += ':OFF_WAIT_REVIVAL'
                 nice_name += ':Always respawn'
 
             if name not in objects:
                 objects[name] = {'display_name':nice_name, 'locations':[]}
-            objects[name]['locations'].append([round(coords[0],2), round(coords[-1],2)])
+
+            objects[name]['locations'].append(data)
             #if len(scale):
             #    objects[name]['locations'][-1].append({'width':scale[0],'height':scale[-1],'rotation':rotation[1]})
 
@@ -137,7 +143,5 @@ for outfilename,folder_suffix in files:
             objects[name]['locations'] += [(round(x,2),round(z,2)) for x,y,z in chunk_objects[name]]
 
     outfile = open(outfilename,'w')
-    outfile.write('var locations = ')
     json.dump(objects, outfile, sort_keys=True,separators=(',', ':'))
-    outfile.write(';\n')
     outfile.close()
