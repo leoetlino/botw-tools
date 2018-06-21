@@ -1,3 +1,4 @@
+import ctypes
 import struct
 import pprint
 import os
@@ -116,7 +117,11 @@ for outfilename,folder_suffix in files:
                         nice_name += '⭐⭐'
 
             actor_hash_id = actor.get('HashId')
-            data['hash_id'] = actor_hash_id
+            if actor_hash_id:
+                data['hash_id'] = ctypes.c_uint32(int(actor_hash_id)).value
+            else:
+                data['hash_id'] = '???'
+
             if actor_hash_id in off_wait_revival_actors:
                 name += ':OFF_WAIT_REVIVAL'
                 nice_name += ':Always respawn'
