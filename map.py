@@ -116,6 +116,10 @@ for outfilename,folder_suffix in files:
                     if weapon_modifier == 3:
                         nice_name += '⭐⭐'
 
+            if name == 'ChangeWeatherTag':
+                for key in ['Weather', 'PaletteSel', 'IgnitedLevel', 'TemperatureDay', 'TemperatureNight', 'TemperatureDirectDay', 'TemperatureDirectNight', 'WeatherEff']:
+                    name += ':' + key + '=' + params.get(key)
+
             actor_hash_id = actor.get('HashId')
             if actor_hash_id:
                 data['hash_id'] = ctypes.c_uint32(int(actor_hash_id)).value
